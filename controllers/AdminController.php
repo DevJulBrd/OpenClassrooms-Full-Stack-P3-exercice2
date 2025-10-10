@@ -246,4 +246,65 @@ class AdminController {
             'dir' => $dir
         ]);
     }
+
+    /**
+     * Affiche les commentaire pour un article.
+     * @return void
+     */
+    public function manageComments() : void
+    {
+        $this->checkIfUserIsConnected();
+
+        $articleId = (int) Utils::request('articleId', -1);
+        if ($articleId <= 0) {
+            throw new Exception("Article invalide.");
+        }
+
+        $articleManager = new ArticleManager();
+        $article = $articleManager->getArticleById($articleId);
+        if (!$article) {
+            throw new Exception("L'article demandé n'existe pas.");
+        }
+
+        $commentManager = new CommentManager();
+        $comments = $commentManager->getAllCommentsByArticleId($articleId);
+
+        $view = new View("Commentaires de l'article");
+        $view->render("manageComments", [
+            'article'  => $article,
+            'comments' => $comments
+        ]);
+    }
+
+    /**
+     * Suppression d'un commentaire.
+     * @return void
+     */
+    public function deleteCommentAdmin() : void
+    {
+        $this->checkIfUserIsConnected();
+
+        $commentId = (int) Utils::request('id', -1);
+        $articleId = (int) Utils::request('articleId', -1);
+
+        if ($commentId <= 0 || $articleId <= 0) {
+            throw new Exception("Requête invalide.");
+        }
+
+        $commentManager = new CommentManager();
+        $comment = $commentManager->getCommentById($commentId);
+        if (!$comment) {
+            throw new Exception("Le commentaire demandé n'existe pas.");
+        }
+
+        // On s'assure que le commentaire appartient bien à l'article demandé
+        if ($comment->getIdArticle() !== $articleId) {
+            throw new Exception("Ce commentaire n'appartient pas à l'article demandé.");
+        }
+
+        $commentManager->deleteComment($comment);
+
+        // Retour à la gestion de commentaires de l’article
+        Utils::redirect("manageComments", ['articleId' => $articleId]);
+    }
 }

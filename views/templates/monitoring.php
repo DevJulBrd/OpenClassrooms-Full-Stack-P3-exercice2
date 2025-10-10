@@ -56,7 +56,7 @@ function sortLink(string $label, string $col, string $currentSort, string $curre
             <?= sortLink('Vues', 'views', $sort, $dir) ?>
         </div>
         <div class="headerCell headerCell--comments">
-            <?= sortLink('Commentaires', 'nb_comments', $sort, $dir) ?>
+            <?= sortLink('Commentaires + Gestion', 'nb_comments', $sort, $dir) ?>
         </div>
     </div>
 
@@ -79,7 +79,13 @@ function sortLink(string $label, string $col, string $currentSort, string $curre
                 <?= (int)$a->getViews() ?>
             </div>
             <div class="headerCell headerCell--comments">
-                <?= $nbComments ?>
+                <a
+                    class="countLink"
+                    href="index.php?action=manageComments&articleId=<?= $a->getId() ?>"
+                    title="Gérer les commentaires de cet article"
+                >
+                    <?= $nbComments ?>
+                </a>
             </div>
         </div>
     <?php endforeach; ?>
