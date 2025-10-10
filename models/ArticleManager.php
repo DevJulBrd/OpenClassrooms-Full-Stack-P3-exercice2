@@ -104,4 +104,50 @@ class ArticleManager extends AbstractEntityManager
         $sql = "UPDATE article SET views = views + 1 WHERE id = :id";
         $this->db->query($sql, ['id' => $id]);
     }
+
+    /**
+     * Récupère les statistiques globales : total articles, total commentaires, total vues.
+     * @return array : un tableau associatif avec les clés 'total_articles', 'total_comments', 'total_views'.
+     */
+    public function getGlobalStats() : array
+    {
+        $sql = "
+            SELECT 
+                (SELECT COUNT(*) FROM article)            AS total_articles,
+                (SELECT COUNT(*) FROM comment)            AS total_comments,
+                (SELECT IFNULL(SUM(views), 0) FROM article) AS total_views
+        ";
+        $result = $this->db->query($sql);
+        return $result->fetch();
+    }
+
+    /**
+     * Récupère tous les articles avec le nombre de commentaires associés.
+     * @return array : un tableau associatif avec les clés 'article' (objet Article) et 'nb_comments' (int).
+     */
+    public function getArticlesWithStats() : array
+    {
+        // Une ligne par article, avec nb de commentaires
+        $sql = "
+            SELECT 
+                a.*, 
+                COUNT(c.id) AS nb_comments
+            FROM article a
+            LEFT JOIN comment c ON c.id_article = a.id
+            GROUP BY a.id
+            ORDER BY a.date_creation DESC
+        ";
+        $result = $this->db->query($sql);
+        $rows = [];
+        while ($row = $result->fetch()) {
+            // On garde l’objet Article pour profiter des getters,
+            // et on ajoute la stat nb_comments à côté (tableau associatif).
+            $article = new Article($row);
+            $rows[] = [
+                'article' => $article,
+                'nb_comments' => (int)$row['nb_comments']
+            ];
+        }
+        return $rows;
+    }
 }

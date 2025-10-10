@@ -9,7 +9,7 @@
     private int $idUser;
     private string $title = "";
     private string $content = "";
-    private int $viewsCounter = 0;
+    private int $views = 0;
     private ?DateTime $dateCreation = null;
     private ?DateTime $dateUpdate = null;  
 
@@ -130,18 +130,18 @@
     }
 
     /** Setter
-     * @param int $viewsCount
+     * @param int $views
      */
-    public function setViewsCount(int $viewsCount) : void
+    public function setViews(int $views) : void
     {
-        $this->viewsCount = $viewsCount;
+        $this->views = $views;
     }
 
     /** Getter 
      * @return int
     */
-    public function getViewsCount() : int
+    public function getViews() : int
     {
-        return $this->viewsCount;
+        return $this->views;
     }
  }
