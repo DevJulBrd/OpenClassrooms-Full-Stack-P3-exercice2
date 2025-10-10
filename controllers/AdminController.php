@@ -193,10 +193,57 @@ class AdminController {
         // Détail par article (vues + nb commentaires)
         $articlesWithStats = $articleManager->getArticlesWithStats();
 
+        // Tri
+        $sort = Utils::request("sort", "date_creation");
+        $dir = Utils::request("dir", "DESC");
+
+        $allowedSorts = ['title', 'date_creation', 'date_update', 'views', 'nb_comments'];
+        if (!in_array($sort, $allowedSorts, true)) {
+            $sort = 'date_creation';
+        }
+        $dir = $dir === 'asc' ? 'asc' : 'desc';
+
+        // Comparateur 
+        usort($articlesWithStats, function(array $rowA, array $rowB) use ($sort, $dir) {
+            /**
+             * @var Article $a
+             * @var Article $b
+             */
+            $a = $rowA['article'];
+            $b = $rowB['article'];
+            $mul = ($dir === 'asc') ? 1 : -1;
+
+            switch ($sort) {
+                case 'title':
+                    return $mul * strcasecmp($a->getTitle(), $b->getTitle());
+
+                case 'date_creation':
+                    $ta = $a->getDateCreation() ? $a->getDateCreation()->getTimestamp() : 0;
+                    $tb = $b->getDateCreation() ? $b->getDateCreation()->getTimestamp() : 0;
+                    return $mul * ($ta <=> $tb);
+
+                case 'date_update':
+                    $ua = $a->getDateUpdate() ? $a->getDateUpdate()->getTimestamp() : 0;
+                    $ub = $b->getDateUpdate() ? $b->getDateUpdate()->getTimestamp() : 0;
+                    return $mul * ($ua <=> $ub);
+
+                case 'views':
+                    return $mul * ($a->getViews() <=> $b->getViews());
+
+                case 'nb_comments':
+                    return $mul * ((int)$rowA['nb_comments'] <=> (int)$rowB['nb_comments']);
+
+                default:
+                    return 0;
+            }
+        });
+
         $view = new View("Monitoring");
         $view->render("monitoring", [
             'globalStats' => $globalStats,
-            'articlesWithStats' => $articlesWithStats
+            'articlesWithStats' => $articlesWithStats,
+            'sort' => $sort,
+            'dir' => $dir
         ]);
     }
 }
