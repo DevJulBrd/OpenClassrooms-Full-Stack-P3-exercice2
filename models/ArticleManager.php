@@ -92,4 +92,16 @@ class ArticleManager extends AbstractEntityManager
         $sql = "DELETE FROM article WHERE id = :id";
         $this->db->query($sql, ['id' => $id]);
     }
+
+    /**
+     * Incrémente le compteur de vues d'un article.
+     * Incrément atomique côté SQL pour éviter les conditions de concurrence.
+     * @param int $id : l'id de l'article.
+     * @return void
+     */
+    public function incrementViews(int $id) : void
+    {
+        $sql = "UPDATE article SET views = views + 1 WHERE id = :id";
+        $this->db->query($sql, ['id' => $id]);
+    }
 }
