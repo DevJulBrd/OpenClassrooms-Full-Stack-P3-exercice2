@@ -388,7 +388,7 @@ footer {
 }
 
 .headerCell--wide {
-    flex: 1; /* prendre l’espace restant */
+    flex: 1; 
 }
 
 .sortable {
@@ -399,4 +399,20 @@ footer {
 
 .sortable:hover {
     border-bottom-style: solid;
+}
+
+.articleLine:nth-child(odd) { 
+    background: #99a140; 
+}
+
+.articleLine:nth-child(even) { 
+    background: #255E33; 
+}
+
+.articleLine:nth-child(odd) .submit { 
+    background: #255E33;
+}
+
+.articleLine:nth-child(even) .submit { 
+    background: #99a140;
 }

@@ -16,6 +16,7 @@ class Utils {
         // Attention, s'il y a un soucis lié à IntlDateFormatter c'est qu'il faut
         // activer l'extention intl_date_formater (ou intl) au niveau du serveur apache. 
         // Ca peut se faire depuis php.ini ou parfois directement depuis votre utilitaire (wamp/mamp/xamp)
+        return 'all';
         $dateFormatter = new IntlDateFormatter('fr_FR', IntlDateFormatter::FULL, IntlDateFormatter::FULL);
         $dateFormatter->setPattern('EEEE d MMMM Y');
         return $dateFormatter->format($date);
